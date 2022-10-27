@@ -1,17 +1,16 @@
 import sys
-import cv2
-
 import os
-
 
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT_PATH)
+print(sys.path)
 
+import numpy as np
+import cv2
 from pykinect_azure.k4abt.body2d import Body2d
 import pykinect_azure as pykinect
 from pykinect_azure.k4a import _k4a
 
-import cv2
 import mediapipe as mp
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -55,7 +54,7 @@ if __name__ == "__main__":
         model_complexity=0,
         min_detection_confidence=0.5,
         min_tracking_confidence=0.5
-    ) as hands:
+    ) as hands: 
 
         while True:
 
@@ -170,6 +169,7 @@ if __name__ == "__main__":
             if cv2.waitKey(1) == ord('q'):  
                 break
 
-            cv2.imshow('COLOR', color_image)        
-            if cv2.waitKey(1) == ord('q'):  
-                break
+            if isinstance(color_image, np.ndarray) :
+                cv2.imshow('COLOR', color_image)        
+                if cv2.waitKey(1) == ord('q'):  
+                    break
