@@ -80,7 +80,9 @@ class Calibration:
 
 		return target_point2d
 
-	def convert_2d_to_2d(self, source_point2d, source_depth, source_camera, target_camera):
+	def convert_2d_to_2d(
+		self, source_point2d,
+		source_depth, source_camera, target_camera):
 		target_point2d = _k4a.k4a_float2_t()
 		valid = ctypes.c_int()
 
@@ -88,7 +90,9 @@ class Calibration:
 
 		return target_point2d
 
-	def convert_color_2d_to_depth_2d(self, source_point2d, depth_image):
+	def convert_color_2d_to_depth_2d(
+		self, source_point2d, depth_image
+	):
 		target_point2d = _k4a.k4a_float2_t()
 		valid = ctypes.c_int()
 

@@ -1,8 +1,6 @@
 import sys
 import os
 
-from torch import DeviceObjType, col_indices_copy
-
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT_PATH)
 print(sys.path)
@@ -11,7 +9,6 @@ import cv2
 from pykinect_azure.k4abt.body2d import Body2d
 import pykinect_azure as pykinect
 from pykinect_azure.k4a import _k4a
-
 
 import mediapipe as mp
 mp_drawing = mp.solutions.drawing_utils
@@ -63,10 +60,9 @@ if __name__ == "__main__":
         cv2.WINDOW_NORMAL
     )
 
-    image_read_succeed = [False] * 5
+    image_read_succeed = [False] * 6
 
     while True:
-
         capture = device.update()
         body_frame = bodyTracker.update()
 
@@ -75,24 +71,26 @@ if __name__ == "__main__":
         image_read_succeed[2], body_image_color  = body_frame.get_segmentation_image()
         image_read_succeed[3], ir_image          = capture.get_ir_image()
         image_read_succeed[4], depth_image       = capture.get_depth_image()
-
-        #print(depth_color_image.shape, body_image_color.shape)
+        image_read_succeed[5], transformed_color_image = capture.get_transformed_color_image()
 
         if False in image_read_succeed :
             print(image_read_succeed)
             continue
-
         
-        print(depth_image.shape, depth_image.dtype, "|", ir_image.shape, ir_image.dtype)
+        #print(depth_image.shape, depth_image.dtype, "|", ir_image.shape, ir_image.dtype)
+        print(transformed_color_image.shape)
 
         cv2.resizeWindow(IR_WINDOW_NAME, ir_image.shape[1], ir_image.shape[0])
-        cv2.imshow(IR_WINDOW_NAME, ir_image)
+        cv2.imshow(IR_WINDOW_NAME, ir_image / 256)# * 10)
 
         cv2.resizeWindow(COLOR_WINDOW_NAME, color_image.shape[1], color_image.shape[0])
         cv2.imshow(COLOR_WINDOW_NAME, color_image)
 
         cv2.resizeWindow(DEPTH_WINDOW_NAME, depth_image.shape[1], depth_image.shape[0])
-        cv2.imshow(DEPTH_WINDOW_NAME, depth_image)
+        cv2.imshow(DEPTH_WINDOW_NAME, depth_image / 256) # / 256)
+
+        cv2.resizeWindow("segmentation", transformed_color_image.shape[1], transformed_color_image.shape[0])
+        cv2.imshow("segmentation", transformed_color_image) # / 256)
 
         if cv2.waitKey(1) == ord('q'):  
             break
