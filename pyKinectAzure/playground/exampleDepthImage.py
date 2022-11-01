@@ -22,7 +22,8 @@ if __name__ == "__main__":
 	device_config.depth_mode = pykinect.K4A_DEPTH_MODE_NFOV_2X2BINNED
 
 	# Start device
-	device = pykinect.start_device(config=device_config)
+	device = pykinect.start_device(
+		 config=device_config)
 
 	cv2.namedWindow('Depth Image',cv2.WINDOW_NORMAL)
 	cv2.namedWindow('IR Image',cv2.WINDOW_NORMAL)

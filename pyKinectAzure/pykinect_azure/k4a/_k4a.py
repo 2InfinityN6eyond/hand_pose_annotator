@@ -181,7 +181,17 @@ def k4a_image_create(image_format, width, height, stride, image_handle):
 
 	return _k4a_image_create(image_format, width, height, stride, image_handle)
 
-def k4a_image_create_from_buffer(image_format, width, height, stride, buffer, buffer_size, buffer_release_cb, buffer_release_cb_context, image_handle):
+def k4a_image_create_from_buffer(
+	image_format,
+	width,
+	height,
+	stride,
+	buffer,
+	buffer_size,
+	buffer_release_cb,
+	buffer_release_cb_context,
+	image_handle
+):
 	"""
 		K4A_EXPORT k4a_result_t k4a_image_create_from_buffer(k4a_image_format_t format,
 																int width_pixels,

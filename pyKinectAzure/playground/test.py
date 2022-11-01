@@ -15,14 +15,12 @@ mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_hands = mp.solutions.hands
 
-
 IR_WINDOW_NAME = "infrared"
 DEPTH_WINDOW_NAME = "depth"
 COLOR_WINDOW_NAME = "color"
 
 COLOR_RESOLUTION = pykinect.K4A_COLOR_RESOLUTION_2160P
 DEPTH_MODE = pykinect.K4A_DEPTH_MODE_NFOV_UNBINNED
-
 
 if __name__ == "__main__":
     # Initialize the library, if the library is not found, add the library path as argument
@@ -35,7 +33,6 @@ if __name__ == "__main__":
     device_config.camera_fps = pykinect.K4A_FRAMES_PER_SECOND_30
 
     device = pykinect.start_device(config=device_config)
-    
     bodyTracker = pykinect.start_body_tracker()
 
     calibration = device.get_calibration(
@@ -43,7 +40,7 @@ if __name__ == "__main__":
         pykinect.K4A_COLOR_RESOLUTION_1440P
     )
 
-    cv2.namedWindow( 
+    cv2.namedWindow(
         DEPTH_WINDOW_NAME,
         cv2.WINDOW_NORMAL
     )
@@ -60,14 +57,14 @@ if __name__ == "__main__":
         cv2.WINDOW_NORMAL
     )
 
-    image_read_succeed = [False] * 6
+    image_read_succeed = [True] * 6
 
     while True:
         capture = device.update()
         body_frame = bodyTracker.update()
 
         image_read_succeed[0], color_image       = capture.get_color_image()
-        image_read_succeed[1], depth_color_image = capture.get_colored_depth_image()
+        #image_read_succeed[1], depth_color_image = capture.get_colored_depth_image()
         image_read_succeed[2], body_image_color  = body_frame.get_segmentation_image()
         image_read_succeed[3], ir_image          = capture.get_ir_image()
         image_read_succeed[4], depth_image       = capture.get_depth_image()
@@ -78,7 +75,7 @@ if __name__ == "__main__":
             continue
         
         #print(depth_image.shape, depth_image.dtype, "|", ir_image.shape, ir_image.dtype)
-        print(transformed_color_image.shape)
+        #print(transformed_color_image.shape)
 
         cv2.resizeWindow(IR_WINDOW_NAME, ir_image.shape[1], ir_image.shape[0])
         cv2.imshow(IR_WINDOW_NAME, ir_image / 256)# * 10)

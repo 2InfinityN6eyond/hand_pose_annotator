@@ -3,11 +3,11 @@ import ctypes
 from pykinect_azure.k4a import _k4a
 from pykinect_azure.k4a.image import Image
 
+from pykinect_azure.k4a import _k4atypes
+
 class Transformation:
 
 	def __init__(self, calibration_handle):
-
-		print("___init___")
 
 		self._handle = _k4a.k4a_transformation_create(
 			calibration_handle
@@ -22,9 +22,6 @@ class Transformation:
 		)	
 
 	def __del__(self):
-
-		print("deleting....")
-
 		self.destroy()
 
 	def is_valid(self):
@@ -39,35 +36,80 @@ class Transformation:
 			self._handle = None
 
 	def depth_image_to_color_camera(self, depth_image):
-		transformed_depth_image = Image.create(depth_image.format,
-												self.color_resolution.width,
-												self.color_resolution.height,
-												self.color_resolution.width*2)
-
-		_k4a.k4a_transformation_depth_image_to_color_camera(self._handle, depth_image.handle(), transformed_depth_image.handle())
-
+		transformed_depth_image = Image.create(
+			depth_image.format,
+			self.color_resolution.width,
+			self.color_resolution.height,
+			self.color_resolution.width * 2
+		)
+		_k4a.k4a_transformation_depth_image_to_color_camera(
+			self._handle,
+			depth_image.handle(),
+			transformed_depth_image.handle()
+		)
 		return transformed_depth_image
 
-	def depth_image_to_color_camera_custom(self, depth_image, custom_image, interpolation = _k4a.K4A_TRANSFORMATION_INTERPOLATION_TYPE_LINEAR):
-		
-
-		transformed_custom_image = Image.create(custom_image.format,
-												self.color_resolution.width,
-												self.color_resolution.height,
-												self.color_resolution.width*self.get_custom_bytes_per_pixel(custom_image))
-
-		transformed_depth_image = Image.create(_k4a.K4A_IMAGE_FORMAT_DEPTH16,
-												self.color_resolution.width,
-												self.color_resolution.height,
-												self.color_resolution.width*2)
-
+	def ir_depth_image_to_color_camera_custom(
+		self,
+		depth_image,
+		ir_image,
+		interpolation = _k4a.K4A_TRANSFORMATION_INTERPOLATION_TYPE_LINEAR
+	) :
+		transformed_ir_image = Image.create(
+			_k4atypes.K4A_IMAGE_FORMAT_CUSTOM16,
+			self.color_resolution.width,
+			self.color_resolution.height,
+			self.color_resolution.width * 2
+		)
+		transformed_depth_image = Image.create(
+			_k4a.K4A_IMAGE_FORMAT_DEPTH16,
+			self.color_resolution.width,
+			self.color_resolution.height,
+			self.color_resolution.width * 2
+		)
 		invalid_custom_value = ctypes.c_uint32()
+		_k4a.k4a_transformation_depth_image_to_color_camera_custom(
+			self._handle,
+			depth_image.handle(),
+			ir_image.handle(),
+			transformed_depth_image.handle(),
+			transformed_ir_image.handle(),
+			interpolation,
+			invalid_custom_value
+		)
+		return transformed_ir_image, transformed_depth_image
 
-		_k4a.k4a_transformation_depth_image_to_color_camera_custom(self._handle, depth_image.handle(), custom_image.handle(), transformed_depth_image.handle(), transformed_custom_image.handle(), interpolation, invalid_custom_value)
-
+	def depth_image_to_color_camera_custom(
+		self,
+		depth_image,
+		custom_image,
+		interpolation = _k4a.K4A_TRANSFORMATION_INTERPOLATION_TYPE_LINEAR
+	):
+		transformed_custom_image = Image.create(
+			custom_image.format,
+			self.color_resolution.width,
+			self.color_resolution.height,
+			self.color_resolution.width*self.get_custom_bytes_per_pixel(
+				custom_image
+			)
+		)
+		transformed_depth_image = Image.create(
+			_k4a.K4A_IMAGE_FORMAT_DEPTH16,
+			self.color_resolution.width,
+			self.color_resolution.height,
+			self.color_resolution.width*2
+		)
+		invalid_custom_value = ctypes.c_uint32()
+		_k4a.k4a_transformation_depth_image_to_color_camera_custom(
+			self._handle,
+			depth_image.handle(),
+			custom_image.handle(),
+			transformed_depth_image.handle(),
+			transformed_custom_image.handle(),
+			interpolation,
+			invalid_custom_value
+		)
 		return transformed_custom_image
-
-
 
 	def color_image_to_depth_camera(self, depth_image, color_image):
 

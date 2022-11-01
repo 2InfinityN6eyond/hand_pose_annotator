@@ -1,7 +1,9 @@
+from jwt import PyJWK
 import numpy as np
 import cv2
 
 from pykinect_azure.k4a import _k4a
+from pykinect_azure.k4a import _k4atypes
 
 class Image:
 
@@ -27,9 +29,41 @@ class Image:
 	@staticmethod
 	def create(image_format,width_pixels,height_pixels,stride_bytes):
 		handle = _k4a.k4a_image_t()
-		_k4a.VERIFY(_k4a.k4a_image_create(image_format,width_pixels,height_pixels,stride_bytes,handle),"Create image failed!")
+		_k4a.VERIFY(
+			_k4a.k4a_image_create(
+				image_format,
+				width_pixels,
+				height_pixels,
+				stride_bytes,
+				handle
+			),
+			"Create image failed!"
+		)
 
 		return Image(handle)
+
+	@staticmethod
+	def create_custom_from_ir(
+		ir_image
+	) :
+		handle = _k4a.k4a_image_t()
+		_k4a.VERIFY(
+			_k4a.k4a_image_create_from_buffer(
+				image_format = _k4atypes.K4A_IMAGE_FORMAT_CUSTOM16,
+				width = ir_image.width,
+				height = ir_image.height,
+				stride = ir_image.stride,
+				buffer = ir_image.get_buffer(),
+				buffer_size = ir_image.get_size(),
+				buffer_release_cb = None,
+				buffer_release_cb_context = None,
+				image_handle = handle
+			),
+			"Create image failed!"
+		)
+
+		return Image(handle)
+
 
 	@property
 	def width(self):
@@ -105,7 +139,9 @@ class Image:
 
 		# Parse buffer based on image formats
 		if image_format == _k4a.K4A_IMAGE_FORMAT_COLOR_MJPG:
-			return True, cv2.imdecode(np.frombuffer(buffer_array, dtype=np.uint8).copy(), -1)
+			return True, cv2.imdecode(
+				np.frombuffer(buffer_array, dtype=np.uint8).copy(), -1
+			)
 		elif image_format == _k4a.K4A_IMAGE_FORMAT_COLOR_NV12:
 			yuv_image = np.frombuffer(buffer_array, dtype=np.uint8).copy().reshape(int(image_height*1.5),image_width)
 			return True, cv2.cvtColor(yuv_image, cv2.COLOR_YUV2BGR_NV12)
