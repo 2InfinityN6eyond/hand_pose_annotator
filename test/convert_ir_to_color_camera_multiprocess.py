@@ -1,4 +1,3 @@
-
 import sys
 import numpy as np
 import cv2
@@ -71,21 +70,7 @@ if __name__ == "__main__":
         
         #ir_transformed_clipped = (ir_transformed_image / ir_transformed_image.max() * 255).astype(np.uint8)
         ir_transformed_clipped = (ir_transformed_image).astype(np.uint8)
-        '''
-        print(
-            ir_transformed_clipped.shape,
-            ir_transformed_clipped.min(),
-            ir_transformed_clipped.mean(),
-            ir_transformed_clipped.std()
-        )
-        print(
-            ir_transformed_image.shape,
-            ir_transformed_image.min(),
-            ir_transformed_image.mean(),
-            ir_transformed_image.std()
-        )
-        '''
-
+    
 
         cv2.resizeWindow(
             DEPTH_TRANSFORMED_NAME,

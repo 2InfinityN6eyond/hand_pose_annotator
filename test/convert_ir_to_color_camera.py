@@ -52,9 +52,6 @@ if __name__ == "__main__":
         depth_object = capture.get_depth_image_object()
         ret, depth_image = depth_object.to_numpy()
 
-        if not ret:
-            continue
-
         ir_custom16_image_object = pykinect.Image.create_custom_from_ir(
             ir_object
         )
@@ -68,7 +65,8 @@ if __name__ == "__main__":
         ret, depth_transformed_image = depth_transformed_object.to_numpy()
         
         #ir_transformed_clipped = (ir_transformed_image / ir_transformed_image.max() * 255).astype(np.uint8)
-        ir_transformed_clipped = (ir_transformed_image).astype(np.uint8)
+        ir_transformed_clipped = ir_transformed_image.astype(np.uint8)
+        
         '''
         print(
             ir_transformed_clipped.shape,
@@ -84,11 +82,10 @@ if __name__ == "__main__":
         )
         '''
 
-
         cv2.resizeWindow(
             DEPTH_TRANSFORMED_NAME,
-            ir_transformed_image.shape[1],
-            ir_transformed_image.shape[0]
+            ir_transformed_image.shape[1] // 2,
+            ir_transformed_image.shape[0] // 2
         )
         cv2.imshow(DEPTH_TRANSFORMED_NAME, ir_transformed_clipped)
     
@@ -99,7 +96,7 @@ if __name__ == "__main__":
 
         cv2.imshow(
             OVERLAYED_NAME,
-            (color_image * 0.5 + ir_ggg_image * 0.5).astype(np.uint8)
+            (color_image * 0.5  + ir_ggg_image * 0.5).astype(np.uint8)
         )
 
         # Press q key to stop
