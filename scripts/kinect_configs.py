@@ -20,7 +20,6 @@ class KinectConfigs :
     K4A_FRAMES_PER_SECOND_15 = 1
     K4A_FRAMES_PER_SECOND_30 = 2
 
-
     color_widths = [0, 1280, 1920, 2560, 2048, 3840, 4096]
     color_heights = [0, 720, 1080, 1440, 1536, 2160, 3072]
     depth_widths =  [0, 320, 640, 512, 1024, 1024]
