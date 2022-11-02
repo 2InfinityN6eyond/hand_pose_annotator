@@ -10,6 +10,7 @@ sys.path.insert(0, ROOT_PATH)
 import pykinect_azure as pykinect
 
 import ctypes
+import multiprocessing
 from multiprocessing import Process, shared_memory, sharedctypes, Pipe
 
 class KinectReader(Process) :
@@ -56,27 +57,8 @@ class KinectReader(Process) :
             self.to_main.send(
                 [curr_idx, nbytes]
             )
-
-            
-            if curr_idx == 0 :
-
-                cv2.imshow(
-                    "test",
-                    
-                )
-
-                continue
-                
-                print(
-                    "orig",
-                    color_image_object.get_buffer()[0:10],
-                    color_image_object.get_size()
-                )
-                print("copy", self.sha_list[curr_idx][0:10], nbytes)
-
             ____end = time.time()
-            #print(curr_idx, color_image_object.get_buffer()[0])
-            #print(____end - ____start)
+            print(____end - ____start)
 
 
     def get_this_step_idx(self) :
@@ -90,11 +72,10 @@ class KinectReader(Process) :
             curr_idx += 1
             if curr_idx == shm_len :
                 curr_idx = 0
-        
 
 if __name__ == "__main__":
 
-    num_sha_set = 10
+    num_sha_set = 5
     windows_names = list(map(str, range(num_sha_set)))
     '''
     cv_windows = list(map(
@@ -115,39 +96,22 @@ if __name__ == "__main__":
 
     while True :
         idx, size = main_2_reader.recv()
-        
         if idx == 0 :
-
-            continue
-
             buffer_array = np.frombuffer(
                 np.ctypeslib.as_array(sha_list[idx], shape=(size))
             )
-
-            color_image = np.frombuffer(buffer_array, dtype=np.uint8).copy().reshape(2160, 3840, 3)
-
-            print(type(buffer_array), buffer_array.shape, type(color_image), color_image.shape)
+            color_image = cv2.imdecode(
+                np.frombuffer(buffer_array, dtype=np.uint8),
+                -1
+            )
+            #print(type(buffer_array), buffer_array.shape, type(color_image), color_image.shape)
 
             cv2.imshow("1", color_image)
 
-        continue
         if cv2.waitKey(1) == ord('q'):  
             break
-        
-            #print("main", sha_list[0][0:10], size)
-            #print()
-        #print(idx, size, sha_list[idx][0:10])
-
-        continue
-
-        cv2.imshow(
-            windows_names[idx],
-            np.frombuffer(
-                np.ctypeslib.as_array(sha_list[idx], shape=(2160,3840,3))
-            )
-        )
-        if cv2.waitKey(1) == ord('q'):  
-            break
-        
-
+    list(map(
+        lambda child_process : child_process.terminate(),
+        multiprocessing.active_children()
+    ))
     reader.join()
