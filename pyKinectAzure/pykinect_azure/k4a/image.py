@@ -142,6 +142,7 @@ class Image:
 			return True, cv2.imdecode(
 				np.frombuffer(buffer_array, dtype=np.uint8).copy(), -1
 			)
+		
 		elif image_format == _k4a.K4A_IMAGE_FORMAT_COLOR_NV12:
 			yuv_image = np.frombuffer(buffer_array, dtype=np.uint8).copy().reshape(int(image_height*1.5),image_width)
 			return True, cv2.cvtColor(yuv_image, cv2.COLOR_YUV2BGR_NV12)

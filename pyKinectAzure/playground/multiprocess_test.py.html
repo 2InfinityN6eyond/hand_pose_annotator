@@ -1,0 +1,59 @@
+<html><head>
+<title>.\multiprocess_test.py</title>
+<meta name="Generator" content="htmlizer/[Twisted, version 22.2.0]" />
+<link rel="alternate" href=".\multiprocess_test.py" type="text/x-python" />
+
+</head>
+<body>
+<pre><span class="py-src-variable">import</span> <span class="py-src-variable">sys</span>
+<span class="py-src-variable">import</span> <span class="py-src-variable">cv2</span>
+<span class="py-src-variable">import</span> <span class="py-src-variable">os</span>
+
+<span class="py-src-variable">ROOT_PATH</span> = <span class="py-src-variable">os</span>.<span class="py-src-variable">path</span>.<span class="py-src-variable">dirname</span>(<span class="py-src-variable">os</span>.<span class="py-src-variable">path</span>.<span class="py-src-variable">dirname</span>(<span class="py-src-variable">os</span>.<span class="py-src-variable">path</span>.<span class="py-src-variable">abspath</span>(<span class="py-src-variable">__file__</span>)))
+<span class="py-src-variable">sys</span>.<span class="py-src-variable">path</span>.<span class="py-src-variable">insert</span>(<span class="py-src-number">0</span>, <span class="py-src-variable">ROOT_PATH</span>)
+
+<span class="py-src-variable">import</span> <span class="py-src-variable">pykinect_azure</span> <span class="py-src-variable">as</span> <span class="py-src-variable">pykinect</span>
+
+<span class="py-src-variable">import</span> <span class="py-src-variable">ctypes</span>
+<span class="py-src-variable">from</span> <span class="py-src-variable">multiprocessing</span> <span class="py-src-variable">import</span> <span class="py-src-variable">Process</span>, <span class="py-src-variable">shared_memory</span>, <span class="py-src-variable">sharedctypes</span>
+
+
+<span class="py-src-variable">class</span> <span class="py-src-identifier">KinectReader</span>(<span class="py-src-parameter">Process</span>) :
+	<span class="py-src-variable">def</span> <span class="py-src-identifier">__init__</span>(<span class="py-src-parameter">self</span>) :
+		<span class="py-src-variable">super</span>(<span class="py-src-variable">KinectReader</span>, <span class="py-src-variable">self</span>).<span class="py-src-variable">__init__</span>()   
+  <span class="py-src-variable">self</span>.<span class="py-src-variable">device_config</span> = <span class="py-src-variable">pykinect</span>.<span class="py-src-variable">default_configuration</span>
+  <span class="py-src-variable">self</span>.<span class="py-src-variable">device_config</span>.<span class="py-src-variable">color_resolution</span> = <span class="py-src-variable">pykinect</span>.<span class="py-src-variable">K4A_COLOR_RESOLUTION_2160P</span>
+  <span class="py-src-string">&#x27;&#x27;&#x27;
+		self.shared_array = sharedctypes.RawArray(
+			ctypes.c_ubyte,
+			3840 * 2160 * 3
+		)
+		&#x27;&#x27;&#x27;</span>
+
+ <span class="py-src-variable">def</span> <span class="py-src-identifier">run</span>(<span class="py-src-parameter">self</span>) :
+		<span class="py-src-variable">pykinect</span>.<span class="py-src-variable">initialize_libraries</span>()
+  <span class="py-src-variable">device</span> = <span class="py-src-variable">pykinect</span>.<span class="py-src-variable">start_device</span>(<span class="py-src-variable">config</span>=<span class="py-src-variable">self</span>.<span class="py-src-variable">device_config</span>)
+  <span class="py-src-variable">cv2</span>.<span class="py-src-variable">namedWindow</span>(<span class="py-src-string">&#x27;Color Image&#x27;</span>,<span class="py-src-variable">cv2</span>.<span class="py-src-variable">WINDOW_NORMAL</span>)
+  
+  
+  <span class="py-src-variable">while</span> <span class="py-src-variable">True</span>:
+			<span class="py-src-variable">capture</span> = <span class="py-src-variable">device</span>.<span class="py-src-variable">update</span>()
+   <span class="py-src-variable">ret</span>, <span class="py-src-variable">color_image</span> = <span class="py-src-variable">capture</span>.<span class="py-src-variable">get_color_image</span>()
+   <span class="py-src-variable">if</span> <span class="py-src-variable">not</span> <span class="py-src-variable">ret</span>:
+				<span class="py-src-variable">continue</span>
+   <span class="py-src-variable">cv2</span>.<span class="py-src-variable">imshow</span>(<span class="py-src-string">&quot;Color Image&quot;</span>,<span class="py-src-variable">color_image</span>)
+   <span class="py-src-variable">if</span> <span class="py-src-variable">cv2</span>.<span class="py-src-variable">waitKey</span>(<span class="py-src-number">1</span>) == <span class="py-src-variable">ord</span>(<span class="py-src-string">&#x27;q&#x27;</span>): 
+				<span class="py-src-variable">break</span>
+
+
+
+<span class="py-src-variable">if</span> <span class="py-src-variable">__name__</span> == <span class="py-src-string">&quot;__main__&quot;</span>:
+
+	<span class="py-src-variable">print</span>(<span class="py-src-string">&quot;sdlfkdsf&quot;</span>)
+ <span class="py-src-variable">reader</span> = <span class="py-src-variable">KinectReader</span>()
+ 
+ <span class="py-src-variable">reader</span>.<span class="py-src-variable">start</span>()
+
+ <span class="py-src-variable">reader</span>.<span class="py-src-variable">join</span>()
+</pre>
+</body>

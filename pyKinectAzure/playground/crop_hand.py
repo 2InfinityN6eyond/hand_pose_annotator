@@ -8,6 +8,9 @@ from hamcrest import less_than
 from torch import col_indices_copy
 
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+print(ROOT_PATH)
+
 sys.path.insert(0, ROOT_PATH)
 
 import pykinect_azure as pykinect

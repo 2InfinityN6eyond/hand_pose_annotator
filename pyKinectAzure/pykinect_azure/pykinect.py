@@ -46,8 +46,12 @@ def init_k4arecord(module_k4arecord_path):
 
     _k4arecord.setup_library(module_k4arecord_path)
 
-def start_device(device_index=0, config=default_configuration, record=False, record_filepath="output.mkv"):
-    
+def start_device(
+    device_index=0,
+    config=default_configuration,
+    record=False,
+    record_filepath="output.mkv"
+):    
     # Create device object
     device = Device(device_index)
 

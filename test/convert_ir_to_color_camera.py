@@ -25,6 +25,7 @@ if __name__ == "__main__":
     device_config.color_resolution = COLOR_MODE
     device_config.depth_mode = DEPTH_MODE
     
+    
     # Start device
     device = pykinect.start_device(config=device_config)
 
