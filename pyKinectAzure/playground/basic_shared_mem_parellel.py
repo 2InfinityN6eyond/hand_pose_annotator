@@ -97,13 +97,19 @@ if __name__ == "__main__":
     while True :
         idx, size = main_2_reader.recv()
         if idx == 0 :
-            buffer_array = np.frombuffer(
-                np.ctypeslib.as_array(sha_list[idx], shape=(size))
-            )
+
+
+
             color_image = cv2.imdecode(
-                np.frombuffer(buffer_array, dtype=np.uint8),
+                np.frombuffer(
+                    np.ctypeslib.as_array(sha_list[idx], shape=(size)),
+                    dtype = np.uint8
+                ),
                 -1
             )
+            
+
+            
             #print(type(buffer_array), buffer_array.shape, type(color_image), color_image.shape)
 
             cv2.imshow("1", color_image)

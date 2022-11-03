@@ -2,6 +2,7 @@ import sys
 import numpy as np
 import cv2
 import os
+import ctypes
 
 from multiprocessing import Process, Pipe, shared_memory
 
@@ -13,6 +14,90 @@ import pykinect_azure as pykinect
 
 from kinect_configs import KinectConfigs
 
+class KinectReader(Process) :
+    def __init__(
+        self,
+        kinect_cfg : KinectConfigs,
+        shared_ctype_arrays_color : list,
+        shared_ctype_arrays_ir    : list,
+        shared_ctype_arrays_depth : list,
+        to_processor_pipes : list,
+    ) :
+        super(KinectReader, self).__init__()
+        self.kinect_cfg = kinect_cfg
+
+        self.shared_ctype_arrays_color = shared_ctype_arrays_color
+        self.shared_ctype_arrays_depth = shared_ctype_arrays_depth
+        self.shared_ctype_arrays_ir = shared_ctype_arrays_ir
+        self.to_processor_pipes = to_processor_pipes
+        self.num_processors = len(self.to_processor_pipes)
+
+    def run(
+        self
+    ) :
+
+        # idx looper.
+        idx_emmiter = self.get_this_step_idx()
+        
+        pykinect.initialize_libraries()
+
+        device_config = pykinect.default_configuration
+        device_config.color_resolution = self.kinect_cfg.color_option
+        device_config.depth_mode = self.kinect_cfg.depth_option
+        device_config.camera_fps = self.kinect_cfg.fps_option
+        
+        device = pykinect.start_device(config=device_config)
+        
+        flags = [False, False, False]
+        while True :
+            
+            capture = device.update()
+            color_image_object = capture.get_color_image_object()
+            ir_image_object    = capture.get_ir_image_object()
+            depth_image_object = capture.get_depth_image_object()
+
+            if None in [
+                color_image_object, color_image_object.get_size(),
+                ir_image_object, ir_image_object.get_size(),
+                depth_image_object, depth_image_object.get_size(),
+            ] :
+                print("read failed")
+                continue
+
+            curr_idx = next(idx_emmiter)
+
+            ctypes.memmove(
+                self.shared_ctype_arrays_color[curr_idx],
+                color_image_object.get_buffer(),
+                color_image_object.get_size()
+            )
+            ctypes.memmove(
+                self.shared_ctype_arrays_ir[curr_idx],
+                ir_image_object.get_buffer(),
+                ir_image_object.get_size()
+            )
+            ctypes.memmove(
+                self.shared_ctype_arrays_depth[curr_idx],
+                depth_image_object.get_buffer(),
+                depth_image_object.get_size()
+            )
+
+            self.to_processor_pipes[curr_idx].send(color_image_object.get_size())
+
+
+    def get_this_step_idx(self) :
+        """
+        iterate 0, 1, 2 ... len(self.color_shm_names) -1 forever
+        """
+        curr_idx = 0
+        while True :
+            yield curr_idx
+            curr_idx += 1
+            if curr_idx == self.num_processors :
+                curr_idx = 0
+
+
+'''
 class KinectReader(Process) :
     def __init__(
         self,
@@ -130,4 +215,4 @@ class KinectReader(Process) :
             if curr_idx == shm_len :
                 curr_idx = 0
 
-
+'''

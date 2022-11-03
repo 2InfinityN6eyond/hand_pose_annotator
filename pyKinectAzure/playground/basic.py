@@ -24,7 +24,7 @@ if __name__ == "__main__":
     while True:
         capture = device.update()
         color_object = capture.get_color_image_object()
-        depth_object = capture.get_color_image_object()
+        depth_object = capture.get_depth_image_object()
         ir_object    = capture.get_ir_image_object()
 
         if not all([color_object, depth_object, ir_object]) :
@@ -32,11 +32,12 @@ if __name__ == "__main__":
 
         print(
             color_object.get_size(),
-            #color_object.get_width_pixels() * color_object.get_height_pixels() * 3,
-            "  ",
-
             depth_object.get_size(),
-            ir_object.get_size()
+            ir_object.get_size(),
+            "  ",
+            type(color_object.get_buffer()),
+            type(depth_object.get_buffer()),
+            type(ir_object.get_buffer())
         )
 
 

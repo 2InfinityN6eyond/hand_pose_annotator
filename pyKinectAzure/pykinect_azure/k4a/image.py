@@ -42,6 +42,34 @@ class Image:
 
 		return Image(handle)
 
+
+	@staticmethod
+	def create_from_buffer(
+		image_format,
+		width,
+		height,
+		stride_bytes,
+		buffer,
+		buffer_size
+	) :
+		handle = _k4a.k4a_image_t()
+		_k4a.VERIFY(
+			_k4a.k4a_image_create_from_buffer(
+				image_format = _k4atypes.K4A_IMAGE_FORMAT_CUSTOM16,
+				width = width,
+				height = height,
+				stride = stride_bytes,
+				buffer = buffer,
+				buffer_size = buffer_size,
+				buffer_release_cb = None,
+				buffer_release_cb_context = None,
+				image_handle = handle
+			),
+			"Create image failed!"
+		)
+
+		return Image(handle)
+
 	@staticmethod
 	def create_custom_from_ir(
 		ir_image
@@ -63,7 +91,6 @@ class Image:
 		)
 
 		return Image(handle)
-
 
 	@property
 	def width(self):
